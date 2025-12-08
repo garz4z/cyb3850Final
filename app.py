@@ -16,7 +16,7 @@ class PasswordManager:
 
     def show_vault(self):
         self.root = tk.Tk()
-        self.vaultScreen = VaultScreen(self.root)
+        self.vaultScreen = VaultScreen(self.root, self.show_login)
 
 
     def run(self):
