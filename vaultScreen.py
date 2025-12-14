@@ -1,6 +1,6 @@
 # vaultScreen.py
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from addScreen import AddScreen
 
@@ -43,6 +43,15 @@ class VaultScreen:
         )
         signout_button.pack(side="right", padx=(0, 10))
 
+        edit_button = ttk.Button(
+            header_frame, text="Edit", command=self.edit_click
+        )
+        edit_button.pack(side="right", padx=(0, 5))
+
+        delete_button = ttk.Button(
+            header_frame, text="Delete", command=self.delete_click
+        )
+        delete_button.pack(side="right", padx=(0, 5))
         # Table frame
         self.root.rowconfigure(1, weight=1)
         self.root.columnconfigure(0, weight=1)
@@ -87,6 +96,7 @@ class VaultScreen:
             self.table.insert(
                 "",
                 "end",
+                iid=str(entry["id"]),
                 values=(
                     entry["site"],
                     entry["username"],
@@ -94,6 +104,41 @@ class VaultScreen:
                     entry["created_at"],
                 ),
             )
+
+    def delete_click(self):
+        selected = self.table.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Select an entry to delete.")
+            return
+
+        entry_id = int(selected[0])
+
+        confirm = messagebox.askyesno(
+            "Confirm Delete", "Are you sure you want to delete this entry?"
+        )
+        if not confirm:
+            return
+
+        self.app.db.delete_entry(entry_id)
+        self._populate_table()
+
+    def edit_click(self):
+        selected = self.table.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Select an entry to edit.")
+            return
+
+        entry_id = int(selected[0])
+
+        entries = self.app.db.get_entries_for_user(
+            self.app.current_user_id, self.app.current_key, self.app.crypto
+        )
+
+        entry = next((e for e in entries if e["id"] == entry_id), None)
+        if not entry:
+            return
+
+        AddScreen(self.root, app=self.app, on_saved=self._populate_table, entry=entry)
 
     # ---------- Buttons ----------
 

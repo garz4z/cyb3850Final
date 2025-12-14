@@ -175,3 +175,45 @@ class VaultDB:
                 }
             )
         return entries
+
+    def update_entry(
+            self,
+            entry_id: int,
+            key: bytes,
+            crypto: CryptoService,
+            site: str,
+            username: str,
+            password: str,
+            notes: str | None = None,
+    ):
+
+        if notes is None:
+            notes = ""
+
+        data_obj = {
+            "username": username,
+            "password": password,
+            "notes": notes,
+        }
+
+        data_json = json.dumps(data_obj)
+        nonce, cipher, tag = crypto.encrypt(data_json, key)
+        now = datetime.utcnow().isoformat(timespec="seconds")
+
+        with self.conn:
+            self.conn.execute(
+                """
+                UPDATE entries
+                SET site = ?, data_nonce = ?, data_cipher = ?, data_tag = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (site, nonce, cipher, tag, now, entry_id),
+            )
+
+    def delete_entry(self, entry_id: int):
+        with self.conn:
+            self.conn.execute(
+                "DELETE FROM entries WHERE id = ?",
+                (entry_id,),
+            )
+
