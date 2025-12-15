@@ -20,31 +20,35 @@ class AddScreen:
         self.addScreen.title("Add Password")
         self.addScreen.resizable(True, True)
         self.addScreen.minsize(400, 300)
+        self.addScreen.configure(background="grey74")
 
         self._build_ui()
 
     def _build_ui(self):
         pad_x = (30, 10)
 
-        ttk.Label(self.addScreen, text="Site / Service:").grid(
-            row=0, column=0, padx=pad_x, pady=(20, 5), sticky="e"
+        style = ttk.Style(self.addScreen)
+        style.configure("Grey.TLabel", background="grey74")
+
+        ttk.Label(self.addScreen, text="Site / Service:", style="Grey.TLabel").grid(
+            row=0, column=0, padx=pad_x, pady=(20, 5), sticky="e",
         )
         self.site_entry = ttk.Entry(self.addScreen, width=40)
         self.site_entry.grid(row=0, column=1, pady=(20, 5), sticky="w")
 
-        ttk.Label(self.addScreen, text="Username / Email:").grid(
+        ttk.Label(self.addScreen, text="Username / Email:", style="Grey.TLabel").grid(
             row=1, column=0, padx=pad_x, pady=(5, 5), sticky="e"
         )
         self.username_entry = ttk.Entry(self.addScreen, width=40)
         self.username_entry.grid(row=1, column=1, pady=(5, 5), sticky="w")
 
-        ttk.Label(self.addScreen, text="Password:").grid(
+        ttk.Label(self.addScreen, text="Password:", style="Grey.TLabel").grid(
             row=2, column=0, padx=pad_x, pady=(5, 5), sticky="e"
         )
         self.password_entry = ttk.Entry(self.addScreen, width=40, show="*")
         self.password_entry.grid(row=2, column=1, pady=(5, 5), sticky="w")
 
-        ttk.Label(self.addScreen, text="Notes (optional):").grid(
+        ttk.Label(self.addScreen, text="Notes (optional):", style="Grey.TLabel").grid(
             row=3, column=0, padx=pad_x, pady=(5, 5), sticky="ne"
         )
         self.notes_text = tk.Text(self.addScreen, width=30, height=4)

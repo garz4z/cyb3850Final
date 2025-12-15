@@ -19,18 +19,24 @@ class VaultScreen:
 
     def _build_ui(self):
         # Header row
-        header = ttk.Frame(self.root)
+        style = ttk.Style(self.root)
+        style.configure("Grey.TFrame", background="grey74")
+        header = ttk.Frame(self.root, style="Grey.TFrame")
         header.grid(row=0, column=0, columnspan=2, sticky="ew", pady=5, padx=10)
+
+        style = ttk.Style(header)
+        style.configure("Grey.TLabel", background="grey74")
 
         title = ttk.Label(
             header,
             text=f"{self.app.current_username}'s Vault" if self.app.current_username else "Vault",
+            style="Grey.TLabel",
         )
         title.configure(font=("Arial", 14, "bold"))
         title.grid(row=0, column=0, padx=(0, 15), sticky="w")
 
         # --- Search UI (FR5) ---
-        ttk.Label(header, text="Search:").grid(row=0, column=1, sticky="e")
+        ttk.Label(header, text="Search:", style="Grey.TLabel").grid(row=0, column=1, sticky="e")
         self.search_var = tk.StringVar()
         search_entry = ttk.Entry(header, textvariable=self.search_var, width=28)
         search_entry.grid(row=0, column=2, padx=(5, 10), sticky="w")
@@ -63,10 +69,12 @@ class VaultScreen:
         self.root.rowconfigure(1, weight=1)
         self.root.columnconfigure(0, weight=1)
 
+
         frame = ttk.Frame(self.root)
         frame.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="nsew")
         frame.rowconfigure(0, weight=1)
         frame.columnconfigure(0, weight=1)
+
 
         columns = ("Site", "Username", "Password", "Date Added")
         self.table = ttk.Treeview(frame, columns=columns, show="headings", height=15)

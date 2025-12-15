@@ -9,6 +9,7 @@ class LoginScreen:
         self.app = app
 
         self.root.title("Login - Password Manager")
+        self.root.configure(background="grey74")
 
         # IMPORTANT: don't force geometry when app is zoomed
         # and don't lock resizing
@@ -18,20 +19,25 @@ class LoginScreen:
 
     def _build_ui(self):
         # Center container frame in the middle of the full screen
-        container = ttk.Frame(self.root, padding=20)
+        style = ttk.Style(self.root)
+        style.configure("Grey.TFrame", background="grey74")
+        container = ttk.Frame(self.root, padding=20, style="Grey.TFrame")
         container.place(relx=0.5, rely=0.5, anchor="center")
 
+        style = ttk.Style(container)
+        style.configure("Grey.TLabel", background="grey74")
+
         # Title
-        title_label = ttk.Label(container, text="Password Manager Login")
+        title_label = ttk.Label(container, text="Password Manager Login", style="Grey.TLabel")
         title_label.configure(font=("Arial", 16, "bold"))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 15))
 
         # Username / password fields
-        ttk.Label(container, text="Username: ").grid(row=1, column=0, padx=(0, 10), pady=5, sticky="e")
+        ttk.Label(container, text="Username: ", style="Grey.TLabel").grid(row=1, column=0, padx=(0, 10), pady=5, sticky="e")
         self.username_entry = ttk.Entry(container, width=40)
         self.username_entry.grid(row=1, column=1, pady=5, sticky="w")
 
-        ttk.Label(container, text="Password: ").grid(row=2, column=0, padx=(0, 10), pady=5, sticky="e")
+        ttk.Label(container, text="Password: ", style="Grey.TLabel").grid(row=2, column=0, padx=(0, 10), pady=5, sticky="e")
         self.password_entry = ttk.Entry(container, width=40, show="*")
         self.password_entry.grid(row=2, column=1, pady=5, sticky="w")
 
