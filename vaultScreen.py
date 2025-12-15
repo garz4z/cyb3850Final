@@ -1,25 +1,20 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 from addScreen import AddScreen
 
 
 class VaultScreen:
     def __init__(self, root, app):
-        """
-        root: main Tk root
-        app: PasswordManager instance (holds current_user_id, current_key, db, crypto)
-        """
         self.root = root
         self.app = app
-
         self.root.title("Password Manager - Vault")
 
         # Holds decrypted entries from DB so we can search/filter without re-querying
         self.all_entries = []
 
         self._build_ui()
-        self.refresh_entries()  # load from DB + render
+        self.refresh_entries()
 
     def _build_ui(self):
         # Header row
@@ -40,7 +35,7 @@ class VaultScreen:
         search_entry.grid(row=0, column=2, padx=(5, 10), sticky="w")
 
         search_btn = ttk.Button(header, text="Search", command=self.apply_search)
-        search_btn.grid(row=0, column=3, padx=(0, 10), sticky="w")
+        search_btn.grid(row=0, column=3, padx=(0, 8), sticky="w")
 
         clear_btn = ttk.Button(header, text="Clear", command=self.clear_search)
         clear_btn.grid(row=0, column=4, padx=(0, 15), sticky="w")
@@ -49,13 +44,18 @@ class VaultScreen:
         search_entry.bind("<KeyRelease>", lambda e: self.apply_search())
 
         # --- Buttons ---
-        add_btn = ttk.Button(header, text="Add New Password", command=self.add_password_click)
-        add_btn.grid(row=0, column=5, padx=(0, 10), sticky="e")
+        add_btn = ttk.Button(header, text="Add", command=self.add_password_click)
+        add_btn.grid(row=0, column=5, padx=(0, 6), sticky="e")
+
+        edit_btn = ttk.Button(header, text="Edit", command=self.edit_click)
+        edit_btn.grid(row=0, column=6, padx=(0, 6), sticky="e")
+
+        delete_btn = ttk.Button(header, text="Delete", command=self.delete_click)
+        delete_btn.grid(row=0, column=7, padx=(0, 10), sticky="e")
 
         signout_btn = ttk.Button(header, text="Sign Out", command=self.signout_click)
-        signout_btn.grid(row=0, column=6, sticky="e")
+        signout_btn.grid(row=0, column=8, sticky="e")
 
-        # Make header spacing behave nicely
         header.columnconfigure(0, weight=1)
 
         # Table area
@@ -108,9 +108,11 @@ class VaultScreen:
             self.table.delete(item)
 
         for e in entries:
+            # IMPORTANT: iid should be entry id so edit/delete can target it
             self.table.insert(
                 "",
                 "end",
+                iid=str(e["id"]),
                 values=(
                     e.get("site", ""),
                     e.get("username", ""),
@@ -141,11 +143,44 @@ class VaultScreen:
         self.search_var.set("")
         self.render_entries(self.all_entries)
 
+    # ---------------- Edit/Delete ----------------
+
+    def delete_click(self):
+        selected = self.table.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Select an entry to delete.")
+            return
+
+        entry_id = int(selected[0])
+
+        confirm = messagebox.askyesno(
+            "Confirm Delete", "Are you sure you want to delete this entry?"
+        )
+        if not confirm:
+            return
+
+        # You MUST have db.delete_entry implemented for this to work
+        self.app.db.delete_entry(entry_id)
+        self.refresh_entries()
+
+    def edit_click(self):
+        selected = self.table.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Select an entry to edit.")
+            return
+
+        entry_id = int(selected[0])
+        entry = next((e for e in self.all_entries if e["id"] == entry_id), None)
+        if not entry:
+            return
+
+        # This assumes AddScreen supports edit mode with an `entry` parameter
+        AddScreen(self.root, app=self.app, on_saved=self.refresh_entries, entry=entry)
+
     # ---------------- Buttons ----------------
 
     def signout_click(self):
         self.app.sign_out()
 
     def add_password_click(self):
-        # Open AddScreen and refresh after save
         AddScreen(self.root, app=self.app, on_saved=self.refresh_entries)

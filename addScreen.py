@@ -5,14 +5,16 @@ from tkinter import messagebox
 
 
 class AddScreen:
-    def __init__(self, root, app, on_saved):
+    def __init__(self, root, app, on_saved, entry=None):
         """
         root: main Tk root (used as parent)
         app: PasswordManager instance (for db, crypto, current user)
         on_saved: callback to refresh vault entries after successful add
         """
+        self.window = None
         self.app = app
         self.on_saved = on_saved
+        self.entry=entry
 
         self.addScreen = tk.Toplevel(root)
         self.addScreen.title("Add Password")
@@ -48,16 +50,22 @@ class AddScreen:
         self.notes_text = tk.Text(self.addScreen, width=30, height=4)
         self.notes_text.grid(row=3, column=1, pady=(5, 10), sticky="w")
 
-        add_button = ttk.Button(self.addScreen, text="Add", command=self.add_click)
+        button_text = "Save" if self.entry else "Add"
+        add_button = ttk.Button(self.addScreen, text=button_text, command=self.save_click)
         add_button.grid(column=1, row=4, pady=(5, 15), sticky="e")
 
+        if self.entry:
+            self.site_entry.insert(0, self.entry["site"])
+            self.username_entry.insert(0, self.entry["username"])
+            self.password_entry.insert(0, self.entry["password"])
+            self.notes_text.insert("1.0", self.entry["notes"])
         self.site_entry.focus()
 
-    def add_click(self):
+    def save_click(self):
         site = self.site_entry.get().strip()
         username = self.username_entry.get().strip()
         password = self.password_entry.get()
-        notes = self.notes_text.get("1.0", tk.END).strip()
+        notes = self.notes_text.get("1.0", "end").strip()
 
         if not site or not username or not password:
             messagebox.showerror(
@@ -65,13 +73,10 @@ class AddScreen:
             )
             return
 
-        if self.app.current_user_id is None or self.app.current_key is None:
-            messagebox.showerror("Error", "No user logged in.")
-            return
 
-        try:
-            self.app.db.add_entry(
-                user_id=self.app.current_user_id,
+        if self.entry:
+            self.app.db.update_entry(
+                entry_id=self.entry["id"],
                 key=self.app.current_key,
                 crypto=self.app.crypto,
                 site=site,
@@ -79,11 +84,16 @@ class AddScreen:
                 password=password,
                 notes=notes,
             )
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to add entry: {e}")
-            return
+        else:
+            self.app.db.add_entry(
+                self.app.current_user_id,
+                self.app.current_key,
+                self.app.crypto,
+                site,
+                username,
+                password,
+                notes,
+            )
 
-        # Refresh table in vault and close
-        if self.on_saved:
-            self.on_saved()
+        self.on_saved()
         self.addScreen.destroy()
