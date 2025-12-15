@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 from addScreen import AddScreen
+from editScreen import EditScreen
 
 
 class VaultScreen:
@@ -80,6 +81,8 @@ class VaultScreen:
 
         scrollbar = ttk.Scrollbar(frame, orient="vertical", command=self.table.yview)
         self.table.configure(yscrollcommand=scrollbar.set)
+
+        self.table.bind("<Double-1>", self.double_click)
 
         self.table.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
@@ -175,7 +178,20 @@ class VaultScreen:
             return
 
         # This assumes AddScreen supports edit mode with an `entry` parameter
-        AddScreen(self.root, app=self.app, on_saved=self.refresh_entries, entry=entry)
+        EditScreen(self.root, app=self.app, on_saved=self.refresh_entries, entry=entry)
+
+    # Function when a row is double clicked
+    def double_click(self, event):
+        row = self.table.identify_row(event.y)
+        if not row:
+            return
+
+        entry = next((e for e in self.all_entries if str(e["id"]) == row), None)
+        if not entry:
+            return
+
+        EditScreen(self.root, app=self.app, on_saved=self.refresh_entries, entry=entry)
+
 
     # ---------------- Buttons ----------------
 
