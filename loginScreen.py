@@ -8,7 +8,7 @@ class LoginScreen:
         self.root = root
         self.app = app
 
-        self.root.title("Login - Password Manager")
+        self.root.title("Login - Lock It Down Password Manager")
         self.root.configure(background="grey74")
 
         # IMPORTANT: don't force geometry when app is zoomed
@@ -28,7 +28,7 @@ class LoginScreen:
         style.configure("Grey.TLabel", background="grey74")
 
         # Title
-        title_label = ttk.Label(container, text="Password Manager Login", style="Grey.TLabel")
+        title_label = ttk.Label(container, text="Lock It Down Password Manager", style="Grey.TLabel")
         title_label.configure(font=("Arial", 16, "bold"))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 15))
 

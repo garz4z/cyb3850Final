@@ -9,7 +9,7 @@ class VaultScreen:
     def __init__(self, root, app):
         self.root = root
         self.app = app
-        self.root.title("Password Manager - Vault")
+        self.root.title("Lock It Down Password Manager - Vault")
 
         # Holds decrypted entries from DB so we can search/filter without re-querying
         self.all_entries = []

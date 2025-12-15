@@ -18,7 +18,7 @@ class PasswordManager:
 
         # Single Tk root
         self.root = tk.Tk()
-        self.root.title("Password Manager")
+        self.root.title("Lock It Down Password Manager")
         self.root.state("zoomed")
         self.root.resizable(True, True)
 
