@@ -19,8 +19,8 @@ class PasswordManager:
         # Single Tk root
         self.root = tk.Tk()
         self.root.title("Password Manager")
-        self.root.geometry("800x600")
-        self.root.resizable(False, False)
+        self.root.state("zoomed")
+        self.root.resizable(True, True)
 
         self.show_login()
 

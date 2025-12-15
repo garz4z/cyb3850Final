@@ -16,8 +16,8 @@ class AddScreen:
 
         self.addScreen = tk.Toplevel(root)
         self.addScreen.title("Add Password")
-        self.addScreen.resizable(False, False)
-        self.addScreen.geometry("400x300")
+        self.addScreen.resizable(True, True)
+        self.addScreen.minsize(400, 300)
 
         self._build_ui()
 
